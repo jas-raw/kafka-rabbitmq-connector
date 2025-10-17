@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-rabbit-connector
+  namespace: event-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-rabbit-connector
+  template:
+    metadata:
+      labels:
+        app: kafka-rabbit-connector
+    spec:
+      containers:
+      - name: kafka-to-rabbit
+        image: kafka-rabbit-connector:1.0-alpine # Reemplaza con tu imagen
+        env:
+        - name: RABBITMQ_SOURCE_HOST
+          value: "rabbitmq-cluster.rabbitmq-system.svc.cluster.local"
+        - name: RABBITMQ_SOURCE_QUEUE
+          value: "rabbitmq-queue"
+        - name: KAFKA_TARGET_SERVERS
+          value: "kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092"
+        - name: KAFKA_TARGET_TOPIC
+          value: "rabbit-events"
+        - name: KAFKA_SOURCE_SERVERS
+          value: "kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092"
+        - name: KAFKA_SOURCE_TOPIC
+          value: "kafka-events"
+        - name: KAFKA_SOURCE_GROUP
+          value: "kafka-to-rabbit-group"
+        - name: RABBITMQ_TARGET_HOST
+          value: "rabbitmq-cluster.rabbitmq-system.svc.cluster.local"
+        - name: RABBITMQ_TARGET_QUEUE
+          value: "kafka-queue"
